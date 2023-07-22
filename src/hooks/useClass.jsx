@@ -10,7 +10,7 @@ const useClass = () => {
     const { refetch, data: classes = [] } = useQuery({
         queryKey: ['getClasses', user?.email],
         queryFn: async () => {
-            const res = await fetch(`http://localhost:5000/classes?email=${user?.email}`)
+            const res = await fetch(`http://localhost:5000/classes/instructor?email=${user?.email}`)
             return res.json();
         },
     })
