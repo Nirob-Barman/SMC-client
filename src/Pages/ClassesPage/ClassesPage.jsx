@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuth from '../../hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const ClassesPage = () => {
     const [classes, setClasses] = useState([]);
@@ -54,13 +55,20 @@ const ClassesPage = () => {
                                 </button>
                             ) : (
                                 <p className="text-red-500">
-                                    {cls.availableSeats === '0'
-                                        ? 'No available seats'
-                                        : 'Logged in as admin/instructor'}
+                                    {cls.availableSeats === '0' ?
+                                        'No available seats'
+                                        :
+                                        'Logged in as admin/instructor'
+                                    }
                                 </p>
                             )
                         ) : (
-                            <p className="text-red-500">Please log in to select a course</p>
+                            <p className="text-red-500">
+                                {/* Please log in to select a course */}
+                                    <Link to="/login" className="btn btn-error">
+                                        <button >Log in to enroll</button>
+                                </Link>
+                            </p>
                         )}
                     </div>
                 ))}
