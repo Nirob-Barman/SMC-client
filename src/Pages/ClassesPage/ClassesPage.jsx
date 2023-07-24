@@ -2,15 +2,27 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuth from '../../hooks/useAuth';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import useClassPage from '../../hooks/useClassPage';
 
 const ClassesPage = () => {
     const [classes, setClasses] = useState([]);
-    const { user } = useAuth();
+    const { user, userRole } = useAuth();
+    const [selectedClasses, setSelectedClasses] = useState([]);
+
+    const [classPage, refetch] = useClassPage();
 
     useEffect(() => {
         // Fetch classes from the server when the component mounts
         fetchClasses();
     }, []);
+
+    useEffect(() => {
+        // Fetch selected classes for the current user (if logged in)
+        if (user && userRole === 'student') {
+            fetchSelectedClasses();
+        }
+    }, [user, userRole]);
 
     const fetchClasses = async () => {
         try {
@@ -21,9 +33,60 @@ const ClassesPage = () => {
         }
     };
 
-    const handleSelectClass = (classId) => {
-        // Placeholder function, add your logic to handle class selection here
-        console.log('Class selected:', classId);
+    const fetchSelectedClasses = async () => {
+        // try {
+        //     // Fetch selected classes for the current user
+        //     const response = await axios.get(`http://localhost:5000/selectClasses/${user.email}`);
+        //     setSelectedClasses(response.data.map((selectedClass) => selectedClass.classId));
+        // } catch (error) {
+        //     console.error(error);
+        // }
+        setSelectedClasses(classPage);
+    };
+
+
+
+    const handleSelectClass = async (classId, classItem) => {
+        try {
+            // Check if the class is already selected by the current user
+            if (selectedClasses.includes(classId)) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Class Already Selected',
+                    text: 'You have already selected this class.',
+                });
+                return; // Exit the function if already selected
+            }
+
+
+            // Send the class data to the server
+            // await axios.post('http://localhost:5000/selectClasses/', classItem);
+
+            await axios.post('http://localhost:5000/selectClasses/', {
+                classItem,
+                enrolledEmail: user?.email,
+            });
+
+
+            // Show success message using SweetAlert2
+            Swal.fire({
+                icon: 'success',
+                title: 'Class Selected!',
+                text: 'You have successfully selected the class.',
+            });
+
+
+            // console.log('Class selected:', classId);
+            console.log('Class:', classItem);
+
+            // Update the selected classes state for the current user
+            setSelectedClasses((prevSelectedClasses) => [...prevSelectedClasses, classId]);
+
+            // Optionally, you can perform any additional actions after the data is successfully sent
+        } catch (error) {
+            console.error('Error selecting class:', error);
+            // Handle error, if any
+        }
     };
 
     return (
@@ -45,31 +108,32 @@ const ClassesPage = () => {
                         <p className="text-sm text-gray-600 mb-2">Instructor: {cls.displayName}</p>
                         <p className="text-sm text-gray-600 mb-2">Available Seats: {cls.availableSeats}</p>
                         <p className="text-sm text-gray-600 mb-4">Price: {cls.price}</p>
+
+
+
                         {user ? (
-                            user.role === 'student' && cls.availableSeats !== '0' ? (
+                            userRole === 'student' && cls.availableSeats !== '0' ? (
                                 <button
-                                    onClick={() => handleSelectClass(cls._id)}
+                                    onClick={() => handleSelectClass(cls._id, cls)}
                                     className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full disabled:opacity-50"
                                 >
                                     Select
                                 </button>
                             ) : (
                                 <p className="text-red-500">
-                                    {cls.availableSeats === '0' ?
-                                        'No available seats'
-                                        :
-                                        'Logged in as admin/instructor'
-                                    }
+                                    {cls.availableSeats === '0' ? 'No available seats' : ''}
                                 </p>
                             )
                         ) : (
                             <p className="text-red-500">
                                 {/* Please log in to select a course */}
-                                    <Link to="/login" className="btn btn-error">
-                                        <button >Log in to enroll</button>
+                                <Link to="/login" className="btn btn-error">
+                                    <button>Log in to enroll</button>
                                 </Link>
                             </p>
                         )}
+
+
                     </div>
                 ))}
             </div>
@@ -78,3 +142,40 @@ const ClassesPage = () => {
 };
 
 export default ClassesPage;
+
+
+
+
+// {
+//     user ? (
+//         userRole === 'student' && cls.availableSeats !== '0' ? (
+//             <button
+//                 onClick={() => handleSelectClass(cls._id, cls)}
+//                 className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full disabled:opacity-50"
+//             >
+//                 Select
+//             </button>
+//         ) : (
+//             <p className="text-red-500">
+//                 {cls.availableSeats === '0' ?
+//                     'No available seats'
+//                     :
+//                     'Logged in as admin/instructor'
+//                 }
+//             </p>
+//         )
+//     ) : (
+//         <p className="text-red-500">
+//             {/* Please log in to select a course */}
+//             <Link to="/login" className="btn btn-error">
+//                 <button >Log in to enroll</button>
+//             </Link>
+//         </p>
+//     )
+// }
+
+
+
+
+
+

@@ -127,7 +127,9 @@ const SignUp = () => {
                 SignUp now
             </div>
             <div className="container mx-auto mt-8">
-                <h1 className="text-3xl font-semibold mb-4">Sign Up</h1>
+                <div className='text-center'>
+                    <h1 className="text-3xl font-semibold mb-4">Sign Up</h1>
+                </div>
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className="md:flex md:space-x-4">
                         <div className="md:w-1/2">
