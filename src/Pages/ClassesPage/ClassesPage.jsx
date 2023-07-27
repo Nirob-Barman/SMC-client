@@ -10,8 +10,6 @@ const ClassesPage = () => {
     const { user, userRole } = useAuth();
     const [selectedClasses, setSelectedClasses] = useState([]);
 
-    const [classPage, refetch] = useClassPage();
-
     useEffect(() => {
         // Fetch classes from the server when the component mounts
         fetchClasses();
@@ -34,14 +32,13 @@ const ClassesPage = () => {
     };
 
     const fetchSelectedClasses = async () => {
-        // try {
-        //     // Fetch selected classes for the current user
-        //     const response = await axios.get(`http://localhost:5000/selectClasses/${user.email}`);
-        //     setSelectedClasses(response.data.map((selectedClass) => selectedClass.classId));
-        // } catch (error) {
-        //     console.error(error);
-        // }
-        setSelectedClasses(classPage);
+        try {
+            // Fetch selected classes for the current user
+            const response = await axios.get(`http://localhost:5000/selectClasses/${user.email}`);
+            setSelectedClasses(response.data.map((selectedClass) => selectedClass.classId));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
 
@@ -62,8 +59,22 @@ const ClassesPage = () => {
             // Send the class data to the server
             // await axios.post('http://localhost:5000/selectClasses/', classItem);
 
+            const { _id, className, classImage, availableSeats, displayName, email, price, status, feedback } = classItem;
+            // await axios.post('http://localhost:5000/selectClasses/', {
+            //     classItem,
+            //     enrolledEmail: user?.email,
+            // });
+
             await axios.post('http://localhost:5000/selectClasses/', {
-                classItem,
+                classId: _id,
+                className,
+                classImage,
+                availableSeats,
+                instructorName: displayName,
+                instructorEmail: email,
+                price,
+                status,
+                feedback,
                 enrolledEmail: user?.email,
             });
 
